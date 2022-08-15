@@ -12,8 +12,7 @@ function search_photos() {
 
   var additionalParams = {
     headers: {
-      'x-api-key': 'QtTlr0aoKn382w1ElTaJg6znh8JfK19x4CCEkJOt',
-      'accept': 'application/json'
+      'x-api-key': 'QtTlr0aoKn382w1ElTaJg6znh8JfK19x4CCEkJOt'
     }
   }
 
@@ -61,7 +60,6 @@ function upload_photos() {
     headers: {
       'Content-Type': file.type,
       'x-api-key': 'QtTlr0aoKn382w1ElTaJg6znh8JfK19x4CCEkJOt',
-      'accept': 'application/json',
       'x-amz-meta-customLabels': additional_labels
     }
   }
