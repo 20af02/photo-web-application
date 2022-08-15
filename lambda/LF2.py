@@ -6,39 +6,45 @@ from boto3.dynamodb.conditions import Key
 from variables import *
 
 
-region = 'us-east-1' 
+region = 'us-east-1'
 service = 'es'
-lexbot = boto3.client('lexv2-runtime')
+lexbot = boto3.client('lexv2-runtime', region_name=region)
 
 host = ES_URL
 index = 'photos'
 url = host + '/' + index + '/_search'
 
+
 def lambda_handler(event, context):
     print(event)
     lexresponse = lexbot.recognize_text(
-        botId = 'ZQ6QI2BI33',
-        botAliasId = 'VJY77YHNUS',
+        botId='QCIT86RV12',
+        botAliasId='RWJALIEWCV',
         localeId='en_US',
         sessionId="test_session",
-        text = event['queryStringParameters']['q']
-        )
+        text=event['queryStringParameters']['q']
+    )
     print('lexresponse', lexresponse)
-    print('lexresponse slot key word',lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue'])
+    res_ = lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue']
+
+    print('lexresponse slot key word',
+          res_)
+
     query = {
-        "size": 3,
+        "size": 10,
         "query": {
             "multi_match": {
-                "query": lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue'],
-                "fields": ['labels']
+                "query": res_,
+                "fields": ["labels"]
             }
         }
     }
-    
-    headers = { "Content-Type": "application/json" }
+
+    headers = {"Content-Type": "application/json"}
 
     # Make the signed HTTP request
-    r = requests.get(url, auth=(USER, PASS), headers=headers, data=json.dumps(query))
+    r = requests.get(url, auth=(USER, PASS),
+                     headers=headers, data=json.dumps(query))
 
     # Create the response and add some extra content to support CORS
     response = {
@@ -51,8 +57,10 @@ def lambda_handler(event, context):
 
     print("es response", r.text)
     posts_list = json.loads(r.text)['hits']['hits']
-    # posts_id_list = [x['_id'] for x in posts_list]
-    
-    response['body'] = json.dumps(posts_list)
+
+    url_list = ['https://s3.amazonaws.com/' +
+                str(x["_source"]["bucket"]) + '/' + str(x["_source"]["object_key"]) for x in posts_list]
+
+    response['body'] = json.dumps(url_list)
 
     return response

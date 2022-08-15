@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="utf-8" />
+      <link rel="stylesheet" href="./assets/css/App.css" />
+
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="theme-color" content="#000000" />
+
+      <link href="./assets/css/App.css" rel="stylesheet" />
+
+      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+            integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+            crossorigin="anonymous"></script>
+
+
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+      <script src="./assets/js/aws-sdk.min.js"></script>
+
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/axios/dist/axios.standalone.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/CryptoJS/components/hmac.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/url-template/url-template.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+      <script type="text/javascript"
+            src="./assets/js/apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+      <script type="text/javascript"
+            src="./assets/js/apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/lib/apiGatewayCore/utils.js"></script>
+      <script type="text/javascript" src="./assets/js/apiGateway-js-sdk/apigClient.js"></script>
+      <script src="./assets/js/photos.js"></script>
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
+
+</head>
+
+<body>
+      <noscript>You need to enable JavaScript to run this app.</noscript>
+      <div id="root"></div>
+
+      <div id="error" class="isa_error"></div>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+      <script src="./assets/js/bootstrap.min.js"></script>
+
+      <div class="container-fluid">
+            <div>
+                  <h1>Photo App</h1>
+            </div>
+
+            <center>
+                  <form id="search">
+                        <input type='text' placeholder='Search' id='transcript' name='transcript'
+                              autocomplete="off"></input>
+
+                        <button id="start-button" class="button-xl" title="Mic On">
+                              <i class="fa fa-microphone"></i> Start
+                        </button>
+                        <button id="stop-button" class="button-xl" title="Mic Off" disabled="true"><i
+                                    class="fa fa-stop-circle"></i>
+                              Stop
+                        </button>
+
+
+                        <button type='button' id="search_button" name="search_button"
+                              onclick="search_photos()">Search</button>
+
+                        <button id="reset-button" type='button'>Clear</button>
+                  </form>
+            </center>
+
+            <div class="upload_photo_handler">
+                  <h2>Upload Photos & give custom labels</h2>
+                  <form id="upload">
+                        <input type="file" class="form-control-file" name="file" id="file"
+                              accept="image/gif, image/jpeg, image/png" />
+                        <input type="text" class="form-control" name="labels" id="labels" placeholder="Labels"
+                              multiple />
+                        <button type="button" onclick="upload_photos(event)">Upload</button>
+                  </form>
+            </div>
+
+            <div>
+                  <h3>Image Results:</h3>
+            </div>
+
+            <div className="image-grid" id="images">
+            </div>
+      </div>
+      <script src="./assets/js/amazon-transcribe/main.js"></script>
+
+</body>
+
+</html>

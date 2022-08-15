@@ -10,7 +10,7 @@ Resources:
           - CFNLambdaRole
           - Arn
       Code:
-        S3Bucket: photo-search-project
+        S3Bucket: photo-search-project-2
         S3Key: LF2.zip
       Runtime: python3.9
       Timeout: 300
@@ -22,7 +22,7 @@ Resources:
       CompatibleRuntimes:
         - python3.9
       Content:
-        S3Bucket: photo-search-project
+        S3Bucket: photo-search-project-2
         S3Key: lambda_packages/python.zip
       Description: Lambda layer for requests auth
       LayerName: lambda_layer_cfn
@@ -59,8 +59,8 @@ Resources:
               - Effect: Allow
                 Action: 's3:*'
                 Resource:
-                  - 'arn:aws:s3:::photo-search-project'
-                  - 'arn:aws:s3:::photo-search-project/*'
+                  - 'arn:aws:s3:::photo-search-project-2'
+                  - 'arn:aws:s3:::photo-search-project-2/*'
         - PolicyName: AmazonLexFullAccess
           PolicyDocument:
             Version: '2012-10-17'

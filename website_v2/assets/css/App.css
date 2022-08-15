@@ -1,0 +1,105 @@
+img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+}
+
+.image-grid {
+      display: grid;
+      gap: 0.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+}
+
+
+body {
+      text-align: center;
+}
+
+
+
+form {
+      width: 500px;
+      max-width: 75%;
+      margin: 0 auto;
+      position: relative;
+      border-radius: 25px;
+      display: grid;
+      gap: 13px;
+}
+
+form input {
+      padding: 7px;
+      border: 1px solid #ccc;
+      border-radius: 1px;
+      box-sizing: border-box;
+      font-size: 16px;
+}
+
+form button {
+      color: #202122;
+      background: #E3E9F1;
+      margin: 0px 13.5px 0px 0px;
+      padding: 10px 27px;
+      font-size: 16px;
+}
+
+form button[type="submit"] {
+      background-color: #0A95FF;
+}
+
+@media only screen and (min-width: 768px) {
+      form {
+            grid-template-columns: 6fr 0fr 1fr 1fr;
+      }
+}
+
+@media (max-width: 768px) {
+      .container-fluid {
+            padding: 25px 35px;
+      }
+}
+
+
+h1 {
+      max-width: 100%;
+      margin-top: 75px;
+      margin-bottom: 75px;
+      font-size: 75px;
+      font-weight: bold;
+      text-align: center;
+      color: #3B4045;
+}
+
+h2 {
+      max-width: 75%;
+      margin-top: 25px;
+      margin-bottom: 25px;
+      font-size: 25px;
+      font-weight: bold;
+      text-align: center;
+      color: #3B4045;
+}
+
+h3 {
+      max-width: 75%;
+      margin-top: 25px;
+      margin-bottom: 25px;
+      font-size: 25px;
+      font-weight: bold;
+      text-align: center;
+      color: #3B4045;
+      justify-content: left;
+}
+
+.footer {
+      display: flex;
+      justify-content: center;
+}
+
+.footer button {
+      padding: 18px;
+      border: none;
+      border-radius: 10px;
+      font-size: 36px;
+      margin: 3rem 0 3rem 0;
+}
