@@ -19,15 +19,19 @@ def lambda_handler(event, context):
     print("event: ")
     print(event)
     print(json.dumps(event))
+    query_text = event['queryStringParameters']['q']
     lexresponse = lexbot.recognize_text(
         botId='QCIT86RV12',
         botAliasId='RWJALIEWCV',
         localeId='en_US',
         sessionId="test_session",
-        text=event['queryStringParameters']['q']
+        text=query_text
     )
     print('lexresponse', lexresponse)
-    res_ = lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue']
+    if lexresponse['sessionState']['intent']['slots'] == {}:
+        res_ = query_text
+    else:
+        res_ = lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue']
     print('lexresponse slot key word',
           res_)
 
