@@ -18,13 +18,13 @@ function search_photos() {
 
   apigClient.searchGet(params, {}, additionalParams).then(
     function (result) {
-      image_urls = result["data"]["body"];
+      image_urls = result["data"];
 
       image_inner_html = $('#images');
       image_inner_html.html('');
 
       for (var i = 0; i < image_urls.length; i++) {
-        image_inner_html.append('<img src="' + image_urls[i] + '" class="img-thumbnail">');
+        image_inner_html.append('<img src="' + image_urls[i] + '>');
       }
 
     }
@@ -32,16 +32,6 @@ function search_photos() {
     console.log(result);
   });
 
-  image_urls = ["https://s3.amazonaws.com/cs-gy-9223-b2/grey-and-white-cat.jpg",
-    "https://s3.amazonaws.com/cs-gy-9223-b2/grey-and-white-cat3.jpg",
-    "https://s3.amazonaws.com/cs-gy-9223-b2/8grey-and-white-cat.jpg"];
-
-  image_inner_html = $('#images');
-  image_inner_html.html('');
-
-  for (var i = 0; i < image_urls.length; i++) {
-    image_inner_html.append('<img src="' + image_urls[i] + '" class="img-thumbnail">');
-  }
 }
 
 
