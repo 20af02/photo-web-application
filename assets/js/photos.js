@@ -1,6 +1,13 @@
 var apigClient = apigClientFactory.newClient();
 
 
+function clear_search() {
+  console.log("clear_search");
+  image_inner_html = $('#images');
+  image_inner_html.html('');
+  $('#transcript').val('');
+}
+
 function search_photos() {
   console.log("search_photos");
   var search_term = $('#transcript').val();
@@ -38,12 +45,10 @@ function search_photos() {
 
 function upload_photos() {
   console.log("upload_photos");
-
   var file_path = $('#file').val().split('\\');
   var file_name = file_path[file_path.length - 1];
 
   var file = $('#file')[0].files[0];
-
   var additional_labels = $('#labels').val();
   console.log(additional_labels);
 
