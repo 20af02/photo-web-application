@@ -19,12 +19,14 @@ function search_photos() {
   apigClient.searchGet(params, {}, additionalParams).then(
     function (result) {
       image_urls = result["data"];
+      console.log(image_urls);
 
       image_inner_html = $('#images');
       image_inner_html.html('');
 
       for (var i = 0; i < image_urls.length; i++) {
         image_inner_html.append('<img src="' + image_urls[i] + '></img>');
+        console.log('<img src="' + image_urls[i] + '></img>');
       }
 
     }
