@@ -21,8 +21,8 @@ def lambda_handler(event, context):
     print(json.dumps(event))
     query_text = event['queryStringParameters']['q']
     lexresponse = lexbot.recognize_text(
-        botId='QCIT86RV12',
-        botAliasId='RWJALIEWCV',
+        botId='ZQ6QI2BI33',
+        botAliasId='VJY77YHNUS',
         localeId='en_US',
         sessionId="test_session",
         text=query_text
@@ -34,23 +34,12 @@ def lambda_handler(event, context):
         res_ = lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue']
     print('lexresponse slot key word',
           res_)
-
-    query = {
-        "size": 10,
-        "query": {
-            "multi_match": {
-                "query": res_,
-                "fields": ["labels"]
-            }
-        }
-    }
+          
+    
+    key_word_list = res_.replace(' and', '').split()
 
     headers = {"Content-Type": "application/json"}
-
-    # Make the signed HTTP request
-    r = requests.get(url, auth=(USER, PASS),
-                     headers=headers, data=json.dumps(query))
-
+    
     # Create the response and add some extra content to support CORS
     response = {
         "statusCode": 200,
@@ -60,13 +49,37 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Methods": '*'
         },
     }
+    
+    final_url_list = []
+    
+    for term in key_word_list:
+        url_list = []
+        query={"query":{
+            "bool":{
+                "must":[
+                    {"fuzzy":{
+                        "labels":{
+                            "value":term}
+                            }
+                    }
+                    ]
+            }
+        },
+        "size":10}
 
-    print("es response", r.text)
-    posts_list = json.loads(r.text)['hits']['hits']
+        # Make the signed HTTP request
+        r = requests.get(url, auth=(USER, PASS),
+                         headers=headers, data=json.dumps(query))
 
-    url_list = ['https://s3.amazonaws.com/' +
-                str(x["_source"]["bucket"]) + '/' + str(x["_source"]["object_key"]) for x in posts_list]
+        print("es response", r.text)
+        posts_list = json.loads(r.text)['hits']['hits']
 
-    response['body'] = json.dumps(url_list)
+        url_list = ['https://s3.amazonaws.com/' +
+                    str(x["_source"]["bucket"]) + '/' + str(x["_source"]["object_key"]) for x in posts_list]
+                    
+        final_url_list += url_list
+
+    final_url_list = list(set(final_url_list))    
+    response['body'] = json.dumps(final_url_list)
 
     return response
