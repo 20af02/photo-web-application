@@ -24,7 +24,7 @@ function search_photos() {
       image_inner_html.html('');
 
       for (var i = 0; i < image_urls.length; i++) {
-        image_inner_html.append('<img src="' + image_urls[i] + '>');
+        image_inner_html.append('<img src="' + image_urls[i] + '></img>');
       }
 
     }
