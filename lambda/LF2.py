@@ -16,7 +16,9 @@ url = host + '/' + index + '/_search'
 
 
 def lambda_handler(event, context):
+    print("event: ")
     print(event)
+    print(json.dumps(event))
     lexresponse = lexbot.recognize_text(
         botId='QCIT86RV12',
         botAliasId='RWJALIEWCV',
@@ -26,7 +28,6 @@ def lambda_handler(event, context):
     )
     print('lexresponse', lexresponse)
     res_ = lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue']
-
     print('lexresponse slot key word',
           res_)
 
@@ -50,9 +51,10 @@ def lambda_handler(event, context):
     response = {
         "statusCode": 200,
         "headers": {
-            "Access-Control-Allow-Origin": '*'
+            "Access-Control-Allow-Origin": '*',
+            "Access-Control-Allow-Headers": '*',
+            "Access-Control-Allow-Methods": '*'
         },
-        "isBase64Encoded": False
     }
 
     print("es response", r.text)
