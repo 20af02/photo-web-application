@@ -55,7 +55,7 @@ function upload_photos() {
     }
   }
 
-  var url = 'https://s3.amazonaws.com/cs-gy-9223-b2/' + file_name;
+  var url = 'https://nqvwr141lk.execute-api.us-east-1.amazonaws.com/1/upload/cs-gy-9223-b2/' + file_name;
 
   axios.put(url, file, additional_params).then(
     function (result) {
