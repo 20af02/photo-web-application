@@ -63,9 +63,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: 's3:*'
-                Resource:
-                  - 'arn:aws:s3:::photo-search-project-2'
-                  - 'arn:aws:s3:::photo-search-project-2/*'
+                Resource: '*'
+                  # - 'arn:aws:s3:::photo-search-project'
+                  # - 'arn:aws:s3:::photo-search-project/*'
         - PolicyName: AmazonLexFullAccess
           PolicyDocument:
             Version: 2012-10-17
@@ -207,8 +207,8 @@ Resources:
   LF6XHI:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: LF1-Final
-      Handler: LF1-Final.lambda_handler
+      FunctionName: LF1
+      Handler: LF1.lambda_handler
       Role: !GetAtt 
         - CFNLambdaRole
         - Arn
@@ -223,7 +223,7 @@ Resources:
       'AWS::CloudFormation::Designer':
         id: 6d4bcb78-4a4f-4f38-b054-5f2517719c38
   IAMR4D17E:
-    DependsOn: S3B1PSEZ
+    DependsOn: LF6XHI
     Type: 'AWS::IAM::Role'
     Properties:
       RoleName: API_EXEC
@@ -254,16 +254,16 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: 's3:PutObject'
-                Resource:
-                  - 'arn:aws:s3:::cs-gy-9223-b2'
-                  - 'arn:aws:s3:::cs-gy-9223-b2/*'
+                Resource: '*'
+                  # - 'arn:aws:s3:::cs-gy-9223-b2-j'
+                  # - 'arn:aws:s3:::cs-gy-9223-b2-j/*'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 10fd4efa-fe5f-4c03-92e0-1a3475574473
   S3B1AW9O:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: B1
+      BucketName: cs-gy-9223-b1-j
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
@@ -298,16 +298,18 @@ Resources:
     DependsOn: LF6XHI
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: B2
+      BucketName: cs-gy-9223-b2-j
       PublicAccessBlockConfiguration:
         BlockPublicAcls: false
         BlockPublicPolicy: false
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Function: !Ref LF6XHI
-            Event: 's3:ObjectCreated:*'
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Function: !GetAtt
+      #       - LF6XHI
+      #       - Arn
+      #       Event: 's3:ObjectCreated:*'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 315493cc-4d6e-45f0-9ff7-d9e74d9879e7
@@ -338,10 +340,11 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Effect: Allow
-            Principal: null
+            Principal:
+              Service:
+                - transcribe.amazonaws.com
             Action:
-              - 'transcribe:StartStreamTranscription'
-              - 'transcribe:StartStreamTranscriptionWebSocket'
+              - 'sts:AssumeRole'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 31f14369-bf0c-4510-ac77-ff4f724800dd
@@ -363,7 +366,7 @@ Resources:
     Properties:
       Enabled: true
       GenerateDistinctId: true
-      Name: API_KEY
+      Name: TestApiKey
     Metadata:
       'AWS::CloudFormation::Designer':
         id: f942e407-3b38-4085-8bd1-1b1730a07acf
