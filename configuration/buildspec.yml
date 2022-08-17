@@ -26,3 +26,4 @@ phases:
       - aws lambda update-function-code --function-name LF1-Final --zip-file fileb://deployment_package_lf1.zip
       - aws lambda update-function-code --function-name picSearchCFN --zip-file fileb://deployment_package_lf2.zip
       - echo "DONE."
+      
