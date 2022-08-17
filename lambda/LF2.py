@@ -21,8 +21,8 @@ def lambda_handler(event, context):
     print(json.dumps(event))
     query_text = event['queryStringParameters']['q']
     lexresponse = lexbot.recognize_text(
-        botId='ZQ6QI2BI33',
-        botAliasId='VJY77YHNUS',
+        botId='QCIT86RV12',
+        botAliasId='RWJALIEWCV',
         localeId='en_US',
         sessionId="test_session",
         text=query_text
@@ -34,12 +34,11 @@ def lambda_handler(event, context):
         res_ = lexresponse['sessionState']['intent']['slots']['PhotoType']['value']['originalValue']
     print('lexresponse slot key word',
           res_)
-          
-    
+
     key_word_list = res_.replace(' and', '').split()
 
     headers = {"Content-Type": "application/json"}
-    
+
     # Create the response and add some extra content to support CORS
     response = {
         "statusCode": 200,
@@ -49,23 +48,23 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Methods": '*'
         },
     }
-    
+
     final_url_list = []
-    
+
     for term in key_word_list:
         url_list = []
-        query={"query":{
-            "bool":{
-                "must":[
-                    {"fuzzy":{
-                        "labels":{
-                            "value":term}
-                            }
+        query = {"query": {
+            "bool": {
+                "must": [
+                    {"fuzzy": {
+                        "labels": {
+                            "value": term}
                     }
-                    ]
+                    }
+                ]
             }
         },
-        "size":10}
+            "size": 10}
 
         # Make the signed HTTP request
         r = requests.get(url, auth=(USER, PASS),
@@ -76,10 +75,10 @@ def lambda_handler(event, context):
 
         url_list = ['https://s3.amazonaws.com/' +
                     str(x["_source"]["bucket"]) + '/' + str(x["_source"]["object_key"]) for x in posts_list]
-                    
+
         final_url_list += url_list
 
-    final_url_list = list(set(final_url_list))    
+    final_url_list = list(set(final_url_list))
     response['body'] = json.dumps(final_url_list)
 
     return response
