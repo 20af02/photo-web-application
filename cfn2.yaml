@@ -380,6 +380,8 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: f942e407-3b38-4085-8bd1-1b1730a07acf
+    DependsOn:
+      - AGRAJ38V
   ED4SPT8:
     Type: 'AWS::Elasticsearch::Domain'
     Properties:
@@ -578,6 +580,37 @@ Resources:
     DependsOn:
       - S3B1S91K
       - S3B1AW9O
+  CFD4HITH:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt 
+              - S3B1AW9O
+              - DomainName
+            Id: !Ref S3B1AW9O
+            S3OriginConfig: {}
+        Enabled: 'true'
+        DefaultCacheBehavior:
+          Compress: true
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          TargetOriginId: !Ref S3B1AW9O
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f0ff6de8-a697-4871-a315-cc58a35d5946
+    DependsOn:
+      - S3B1AW9O
 Outputs:
   WebsiteURL:
     Value: !GetAtt 
@@ -744,10 +777,12 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: 280
-        'y': 470
+        x: 120
+        'y': 330
       z: 1
       embeds: []
+      dependson:
+        - c6746086-6377-424d-bc80-9ef78e9812f1
     ab1178ed-5711-4ca8-8f55-e1df22af17d0:
       size:
         width: 60
@@ -824,22 +859,12 @@ Metadata:
       embeds: []
       dependson:
         - bcace4e2-e4fa-4265-b798-ee7297ef3d51
-        - 223d0950-9ce0-40c9-aba2-8f31827db03c
-    a05fd3c7-2009-469c-9781-1cd90d86d5ad:
-      source:
-        id: 116ab870-c2cc-4109-ae9a-801378dec2c3
-      target:
-        id: bcace4e2-e4fa-4265-b798-ee7297ef3d51
-      z: 11
-    5dc60e19-03c6-4d86-81ed-bb32ac5b0946:
-      source:
-        id: 678ead06-deb1-4eea-8c22-6b6a4883b304
-      target:
-        id: bcace4e2-e4fa-4265-b798-ee7297ef3d51
-      z: 12
-    083e82f2-7cd3-4526-b2c3-f70db384f225:
-      source:
-        id: 678ead06-deb1-4eea-8c22-6b6a4883b304
-      target:
-        id: 223d0950-9ce0-40c9-aba2-8f31827db03c
-      z: 13
+    f0ff6de8-a697-4871-a315-cc58a35d5946:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -410
+        'y': 420
+      z: 0
+      embeds: []
