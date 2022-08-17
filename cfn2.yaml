@@ -388,7 +388,7 @@ Resources:
   ED4SPT8:
     Type: 'AWS::Elasticsearch::Domain'
     Properties:
-      DomainName: ES1
+      DomainName: photos
       ElasticsearchVersion: '7.10'
       ElasticsearchClusterConfig:
         DedicatedMasterEnabled: false
