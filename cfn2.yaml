@@ -1,35 +1,17 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
-  CodebuildRoleArn:
-    Type: String
-    Description: Arn for codebuild role
-  CloudformationRoleArn:
-    Type: String
-    Description: Arn for cloudformation role
-  CodepipelineRoleArn:
-    Type: String
-    Description: Arn for codepipeline role
   S3ArtifactStore:
     Type: String
-    Description: Name of S3 bucket
-  S3BuildsPrefix:
-    Type: String
-    Default: builds/lambdas
-    Description: Location of lambda builds in S3 Bucket
   TemplateFileName:
     Type: String
     Default: template_file.yaml
-    Description: Name of the cloudformation template created by codebuild
   GithubConnectionArn:
     Type: String
-    Description: This arn is created in codepipeline connections through the console
   GithubRepositoryName:
     Type: String
-    Description: Path of the Github repository
   GithubBranch:
     Type: String
     Default: main
-    Description: Name of the branch
 Resources:
   CFNLambda:
     Type: 'AWS::Lambda::Function'
