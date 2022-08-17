@@ -8,11 +8,6 @@ phases:
       - pip install -r requirements.txt -t lib
   build:
     commands:
-      - echo "Zipping deployment package..."
-      - cd lib
-      - zip -r9 ../deployment_package_lf1.zip .
-      - zip -r9 ../deployment_package_lf2.zip .
-      - cd ..
       - cd lambda
       - mv LF1.py lambda_function.py
       - zip -r9 deployment_package_lf1.zip lambda_function.py
