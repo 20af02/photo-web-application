@@ -563,7 +563,7 @@ Resources:
               Configuration:
                 ConnectionArn: !Ref GithubConnectionArn
                 FullRepositoryId: 20af02/photo-web-application
-                BranchName: lambda
+                BranchName: frontend
                 OutputArtifactFormat: CODE_ZIP
               OutputArtifacts:
                 - Name: SourceArtifact
