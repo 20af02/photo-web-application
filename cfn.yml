@@ -1,14 +1,25 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  GithubConnectionArn:
+    Type: String
+  GithubRepositoryName:
+    Type: String
+  GithubBranch:
+    Type: String
+    Default: main
+  ESUserName:
+    Type: String
+  ESPass:
+    Type: String
 Resources:
   CFNLambda:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: picSearchCFN
+      FunctionName: picSearchCFNv2
       Handler: LF2.lambda_handler
-      Role:
-        'Fn::GetAtt':
-          - CFNLambdaRole
-          - Arn
+      Role: !GetAtt 
+        - CFNLambdaRole
+        - Arn
       Code:
         S3Bucket: photo-search-project-2
         S3Key: LF2.zip
@@ -16,8 +27,11 @@ Resources:
       Timeout: 300
       Layers:
         - !Ref lambdaLayerCFN
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c0a3d412-1f1e-41a8-bf8c-4a564283b693
   lambdaLayerCFN:
-    Type: AWS::Lambda::LayerVersion
+    Type: 'AWS::Lambda::LayerVersion'
     Properties:
       CompatibleRuntimes:
         - python3.9
@@ -25,14 +39,17 @@ Resources:
         S3Bucket: photo-search-project-2
         S3Key: lambda_packages/python.zip
       Description: Lambda layer for requests auth
-      LayerName: lambda_layer_cfn
+      LayerName: lambda_layer_cfnv2
       LicenseInfo: MIT
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 10ea110e-91c2-4d14-926f-191b282c700c
   CFNLambdaRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: cfn_lambdaRole
+      RoleName: cfn_lambdaRolev2
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Principal:
@@ -44,7 +61,7 @@ Resources:
       Policies:
         - PolicyName: AWSLambdaBasicExecutionRole
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
@@ -52,78 +69,85 @@ Resources:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
                 Resource: '*'
-        - PolicyName: AmazonS3FullAccess
+        - PolicyName: AmazonS3FullAccessv2
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action: 's3:*'
-                Resource:
-                  - 'arn:aws:s3:::photo-search-project-2'
-                  - 'arn:aws:s3:::photo-search-project-2/*'
-        - PolicyName: AmazonLexFullAccess
+                Resource: '*'
+        - PolicyName: AmazonLexFullAccessv2
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action: 'lex:*'
                 Resource: '*'
-# The OrderFlower bot consists of the following:
-# 1. IAM role that is used by the bot at runtime
-# 2. Inline Bot
-# 3. Bot Version
-# 4. Alias
-  # 1. IAM Role used by the Lex service to make runtime calls
+        - PolicyName: AmazonRekognitionFullAccessv2
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'rekognition:*'
+                Resource: '*'
+        - PolicyName: AmazonOpenSearchServiceFullAccessv2
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 'es:*'
+                Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 5d807c6f-2b9a-4a53-99d5-2680c7ac657d
   BotRuntimeRole:
-    Type: AWS::IAM::Role
+    Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Principal:
               Service:
                 - lexv2.amazonaws.com
             Action:
-              - "sts:AssumeRole"
-      Path: "/"
+              - 'sts:AssumeRole'
+      Path: /
       Policies:
-        - PolicyName: LexRuntimeRolePolicy
+        - PolicyName: LexRuntimeRolePolicyv2
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - "polly:SynthesizeSpeech"
-                  - "comprehend:DetectSentiment"
-                Resource: "*"
- 
-  # 2. Inline bot definition that depends on the IAM role.
-  # The bot definition consists of combining all the child resources into one CFN resource.
-  # This includes Locales, Intents, Slots, and SlotTypes.
+                  - 'polly:SynthesizeSpeech'
+                  - 'comprehend:DetectSentiment'
+                Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 52677107-4b1d-4a83-8440-4b1d8e5b1b19
   PhotoSearchCFNBot:
     DependsOn: BotRuntimeRole
-    Type: AWS::Lex::Bot
+    Type: 'AWS::Lex::Bot'
     Properties:
-      Name: "PhotoSearchWithCFN"
-      RoleArn: !GetAtt BotRuntimeRole.Arn
+      Name: PhotoSearchWithCFNv2
+      RoleArn: !GetAtt 
+        - BotRuntimeRole
+        - Arn
       DataPrivacy:
         ChildDirected: false
       IdleSessionTTLInSeconds: 300
-      Description: "How to create a PhotoSearch bot with CFN"
-      # We provide a setting that allows you to auto build the locales provided.
-      # Locale builds are also kicked off if you attempt to create a bot version 
-      # that depends on an unbuilt locale.
+      Description: How to create a PhotoSearch bot with CFN
       AutoBuildBotLocales: false
       BotLocales:
-        - LocaleId: "en_US"
-          Description: "Book a trip bot Locale"
-          NluConfidenceThreshold: 0.40
+        - LocaleId: en_US
+          Description: Book a trip bot Locale
+          NluConfidenceThreshold: 0.4
           VoiceSettings:
-            VoiceId: "Ivy"
+            VoiceId: Ivy
           SlotTypes:
-            - Name: "PhotoTypes"
-              Description: "Slot Type description"
+            - Name: PhotoTypes
+              Description: Slot Type description
               SlotTypeValues:
                 - SampleValue:
                     Value: cats
@@ -133,38 +157,46 @@ Resources:
                     Value: birds
                 - SampleValue:
                     Value: trees
+                - SampleValue:
+                    Value: 'cats, dogs'
+                - SampleValue:
+                    Value: 'birds, trees'
               ValueSelectionSetting:
                 ResolutionStrategy: ORIGINAL_VALUE
           Intents:
-            - Name: "SearchIntent"
-              Description: "Intent to search photos"
+            - Name: SearchIntent
+              Description: Intent to search photos
               SampleUtterances:
-                - Utterance: "show me {PhotoType}"
-                - Utterance: "show me photos with {PhotoType} in them"
+                - Utterance: 'show me {PhotoType}'
+                - Utterance: 'show me photos with {PhotoType} in them'
+                - Utterance: 'show me {PhotoType} and {PhotoType}'
+                - Utterance: '{PhotoType} and {PhotoType}'
+                - Utterance: '{PhotoType}, {PhotoType}'
               SlotPriorities:
                 - Priority: 1
                   SlotName: PhotoType
               Slots:
-                - Name: "PhotoType"
-                  Description: "something"
-                  SlotTypeName: "PhotoTypes"
+                - Name: PhotoType
+                  Description: something
+                  SlotTypeName: PhotoTypes
                   ValueElicitationSetting:
-                    SlotConstraint: "Required"
+                    SlotConstraint: Required
                     PromptSpecification:
                       MessageGroupsList:
                         - Message:
                             PlainTextMessage:
-                              Value: "What type of photos do you want to search?"
+                              Value: What type of photos do you want to search?
                       MaxRetries: 3
                       AllowInterrupt: false
-            - Name: "FallbackIntent"
-              Description: "Default intent when no other intent matches"
-              ParentIntentSignature: "AMAZON.FallbackIntent"
- 
-  # 3. Define a bot version that depends on the DRAFT version of the Lex Bot.
+            - Name: FallbackIntent
+              Description: Default intent when no other intent matches
+              ParentIntentSignature: AMAZON.FallbackIntent
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c2848161-f225-42f7-b70f-9f627a1c5c5b
   PhotoSearchCFNBotVersionWithCFN:
     DependsOn: PhotoSearchCFNBot
-    Type: AWS::Lex::BotVersion
+    Type: 'AWS::Lex::BotVersion'
     Properties:
       BotId: !Ref PhotoSearchCFNBot
       BotVersionLocaleSpecification:
@@ -172,15 +204,670 @@ Resources:
           BotVersionLocaleDetails:
             SourceBotVersion: DRAFT
       Description: PhotoSearch Version
- 
-  # 4. Define the alias by providing the bot version created by the 
-  #    AWS::Lex::BotVersion resource above.
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: eb60b82f-dc7b-4d60-8fb2-e9c207aab2f3
   FirstBotAliasWithCFN:
     DependsOn: PhotoSearchCFNBotVersionWithCFN
-    Type: AWS::Lex::BotAlias
+    Type: 'AWS::Lex::BotAlias'
     Properties:
       BotId: !Ref PhotoSearchCFNBot
-      BotAliasName: "PhotoSearchProd"
-      BotVersion: !GetAtt PhotoSearchCFNBotVersionWithCFN.BotVersion
+      BotAliasName: PhotoSearchProdv2
+      BotVersion: !GetAtt 
+        - PhotoSearchCFNBotVersionWithCFN
+        - BotVersion
       SentimentAnalysisSettings:
         DetectSentiment: true
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 1cec9d29-c107-4afa-9148-3e3a6d67510a
+  LF1:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: LF1v2
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt 
+        - CFNLambdaRole
+        - Arn
+      Code:
+        S3Bucket: photo-search-project-2
+        S3Key: LF1.zip
+      Runtime: python3.9
+      Timeout: 300
+      Layers:
+        - !Ref lambdaLayerCFN
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 6d4bcb78-4a4f-4f38-b054-5f2517719c38
+  gateways3lambdarole:
+    DependsOn: LF1
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: API_EXECv2
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: AWSLambdaBasicExecutionRole
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource: '*'
+        - PolicyName: AmazonS3PutAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 's3:PutObject'
+                Resource: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 10fd4efa-fe5f-4c03-92e0-1a3475574473
+  B1:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: cs-gy-9223-b1-j
+      AccessControl: PublicRead
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 223d0950-9ce0-40c9-aba2-8f31827db03c
+  B1Policy:
+    DependsOn:
+      - B1
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref B1
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action:
+            - 's3:GetObject'
+          Resource:
+            - !Sub 'arn:aws:s3:::${B1}'
+            - !Sub 'arn:aws:s3:::${B1}/*'
+          Principal:
+            AWS: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 7ed002b4-a927-4d2a-b236-e8c38f202f2b
+  B2:
+    DependsOn: LF1
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: cs-gy-9223-b2-j
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 315493cc-4d6e-45f0-9ff7-d9e74d9879e7
+  B2Policy:
+    DependsOn: B2
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref B2
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Effect: Allow
+          Action:
+            - 's3:GetObject'
+          Resource:
+            - !Sub 'arn:aws:s3:::${B2}'
+            - !Sub 'arn:aws:s3:::${B2}/*'
+          Principal:
+            AWS: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 29d96939-dd20-4989-9002-1f89448a4d12
+  transcriberole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: Transcribe_rolev2
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - transcribe.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 31f14369-bf0c-4510-ac77-ff4f724800dd
+  APIG:
+    DependsOn:
+      - B2
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      ApiKeySourceType: HEADER
+      BinaryMediaTypes:
+        - '*/*'
+      BodyS3Location:
+        Bucket: photo-search-project-2
+        Key: swagger.yaml
+      Name: AI Photo Searchv2
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: c6746086-6377-424d-bc80-9ef78e9812f1
+  APIGKEY:
+    Type: 'AWS::ApiGateway::ApiKey'
+    Properties:
+      Enabled: true
+      GenerateDistinctId: true
+      Name: TestApiKey
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f942e407-3b38-4085-8bd1-1b1730a07acf
+    DependsOn:
+      - APIG
+  photos:
+    Type: 'AWS::Elasticsearch::Domain'
+    Properties:
+      DomainName: photosv2
+      ElasticsearchVersion: '7.10'
+      ElasticsearchClusterConfig:
+        DedicatedMasterEnabled: false
+        InstanceCount: '1'
+        InstanceType: t3.small.elasticsearch
+        ZoneAwarenessEnabled: false
+      EBSOptions:
+        EBSEnabled: true
+        Iops: '0'
+        VolumeSize: '10'
+        VolumeType: gp2
+      EncryptionAtRestOptions:
+        Enabled: true
+      NodeToNodeEncryptionOptions:
+        Enabled: true
+      AdvancedSecurityOptions:
+        Enabled: true
+        InternalUserDatabaseEnabled: true
+        MasterUserOptions:
+          MasterUserName: master
+          MasterUserPassword: '?hZV+2.D'
+      DomainEndpointOptions:
+        EnforceHTTPS: true
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: ab1178ed-5711-4ca8-8f55-e1df22af17d0
+  codepipelinerole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: codepipeline_rolev2
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: '*'
+                Effect: Allow
+                Action: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 2eeadd19-79c0-4f8e-9c3e-7cb5485ae618
+  codebuildrole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: logs
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: '*'
+                Effect: Allow
+                Action: '*'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 826b894c-88b5-41e2-adba-a7fe842e8d32
+  lambdacodepipeline:
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Name: lambda-code-pipeline
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: 'aws/codebuild/standard:5.0'
+        ImagePullCredentialsType: CODEBUILD
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: AWS_DEFAULT_REGION
+            Value: !Ref 'AWS::Region'
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref 'AWS::AccountId'
+      ServiceRole: !GetAtt 
+        - codebuildrole
+        - Arn
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: configuration/buildspec.yaml
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d6e7c83d-a417-4af9-9278-84a1291d22bf
+  P1:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: lambda-pipeline
+      ArtifactStore:
+        Type: S3
+        Location: !Ref s3artifactstore
+      RoleArn: !GetAtt 
+        - codepipelinerole
+        - Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: ApplicationSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref GithubConnectionArn
+                FullRepositoryId: 20af02/photo-web-application
+                BranchName: lambda
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: BuildProject
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref lambdacodepipeline
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts:
+                - Name: BuildArtifact
+              RunOrder: 1
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 116ab870-c2cc-4109-ae9a-801378dec2c3
+    DependsOn:
+      - s3artifactstore
+  s3artifactstore:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: s3artifactstore
+    DeletionPolicy: Delete
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: bcace4e2-e4fa-4265-b798-ee7297ef3d51
+  P2:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: frontend-pipeline
+      ArtifactStore:
+        Type: S3
+        Location: !Ref s3artifactstore
+      RoleArn: !GetAtt 
+        - codepipelinerole
+        - Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: ApplicationSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref GithubConnectionArn
+                FullRepositoryId: 20af02/photo-web-application
+                BranchName: lambda
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+        - Name: Deploy
+          Actions:
+            - Name: Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: S3
+                Version: '1'
+              Configuration:
+                BucketName: !Ref B1
+                CannedACL: public-read
+                Extract: true
+              InputArtifacts:
+                - Name: SourceArtifact
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 678ead06-deb1-4eea-8c22-6b6a4883b304
+    DependsOn:
+      - s3artifactstore
+      - B1
+  CFB1:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt 
+              - B1
+              - DomainName
+            Id: !Ref B1
+            S3OriginConfig: {}
+        Enabled: 'true'
+        DefaultCacheBehavior:
+          Compress: true
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          TargetOriginId: !Ref B1
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: f0ff6de8-a697-4871-a315-cc58a35d5946
+    DependsOn:
+      - B1
+Outputs:
+  WebsiteURL:
+    Value: !GetAtt 
+      - B1
+      - WebsiteURL
+    Description: URL for website hosted on S3
+  S3BucketSecureURL:
+    Value: !Join 
+      - ''
+      - - 'https://'
+        - !GetAtt 
+          - B1
+          - DomainName
+    Description: Name of S3 bucket to hold website content
+  P1PipelineUrl:
+    Value: !Sub >-
+      https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${P1}
+  P2PipelineUrl:
+    Value: !Sub >-
+      https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${P2}
+Metadata:
+  'AWS::CloudFormation::Designer':
+    52677107-4b1d-4a83-8440-4b1d8e5b1b19:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -180
+        'y': 0
+      z: 1
+      embeds: []
+    c2848161-f225-42f7-b70f-9f627a1c5c5b:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -50
+        'y': 20
+      z: 1
+      embeds: []
+    eb60b82f-dc7b-4d60-8fb2-e9c207aab2f3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -180
+        'y': 120
+      z: 1
+      embeds: []
+    1cec9d29-c107-4afa-9148-3e3a6d67510a:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -50
+        'y': 120
+      z: 1
+      embeds: []
+    5d807c6f-2b9a-4a53-99d5-2680c7ac657d:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 20
+        'y': 200
+      z: 1
+      embeds: []
+    10ea110e-91c2-4d14-926f-191b282c700c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 30
+        'y': 330
+      z: 1
+      embeds: []
+    c0a3d412-1f1e-41a8-bf8c-4a564283b693:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 110
+        'y': 260
+      z: 1
+      embeds: []
+    6d4bcb78-4a4f-4f38-b054-5f2517719c38:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -80
+        'y': 330
+      z: 1
+      embeds: []
+    10fd4efa-fe5f-4c03-92e0-1a3475574473:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -300
+        'y': 510
+      z: 1
+      embeds: []
+      dependson:
+        - 315493cc-4d6e-45f0-9ff7-d9e74d9879e7
+        - 6d4bcb78-4a4f-4f38-b054-5f2517719c38
+    223d0950-9ce0-40c9-aba2-8f31827db03c:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -310
+        'y': 420
+      z: 1
+      embeds: []
+    7ed002b4-a927-4d2a-b236-e8c38f202f2b:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -200
+        'y': 420
+      z: 1
+      embeds: []
+      dependson:
+        - 223d0950-9ce0-40c9-aba2-8f31827db03c
+    315493cc-4d6e-45f0-9ff7-d9e74d9879e7:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -200
+        'y': 510
+      z: 1
+      embeds: []
+      dependson:
+        - 6d4bcb78-4a4f-4f38-b054-5f2517719c38
+    29d96939-dd20-4989-9002-1f89448a4d12:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -80
+        'y': 510
+      z: 1
+      embeds: []
+      isassociatedwith:
+        - 223d0950-9ce0-40c9-aba2-8f31827db03c
+      dependson:
+        - 315493cc-4d6e-45f0-9ff7-d9e74d9879e7
+    31f14369-bf0c-4510-ac77-ff4f724800dd:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -70
+        'y': 200
+      z: 1
+      embeds: []
+    c6746086-6377-424d-bc80-9ef78e9812f1:
+      size:
+        width: 150
+        height: 150
+      position:
+        x: 40
+        'y': 430
+      z: 1
+      embeds: []
+      dependson:
+        - 315493cc-4d6e-45f0-9ff7-d9e74d9879e7
+    f942e407-3b38-4085-8bd1-1b1730a07acf:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 220
+        'y': 470
+      z: 0
+      embeds: []
+      dependson:
+        - c6746086-6377-424d-bc80-9ef78e9812f1
+    ab1178ed-5711-4ca8-8f55-e1df22af17d0:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -80
+        'y': 420
+      z: 0
+      embeds: []
+    2eeadd19-79c0-4f8e-9c3e-7cb5485ae618:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -190
+        'y': 260
+      z: 0
+      embeds: []
+    826b894c-88b5-41e2-adba-a7fe842e8d32:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -300
+        'y': 60
+      z: 0
+      embeds: []
+    d6e7c83d-a417-4af9-9278-84a1291d22bf:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -310
+        'y': 140
+      z: 0
+      embeds: []
+    116ab870-c2cc-4109-ae9a-801378dec2c3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -310
+        'y': 220
+      z: 0
+      embeds: []
+    bcace4e2-e4fa-4265-b798-ee7297ef3d51:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -430
+        'y': 260
+      z: 0
+      embeds: []
+    678ead06-deb1-4eea-8c22-6b6a4883b304:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -310
+        'y': 300
+      z: 0
+      embeds: []
+    f0ff6de8-a697-4871-a315-cc58a35d5946:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -410
+        'y': 420
+      z: 0
+      embeds: []
