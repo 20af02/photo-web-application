@@ -1,4 +1,35 @@
 AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  CodebuildRoleArn:
+    Type: String
+    Description: Arn for codebuild role
+  CloudformationRoleArn:
+    Type: String
+    Description: Arn for cloudformation role
+  CodepipelineRoleArn:
+    Type: String
+    Description: Arn for codepipeline role
+  S3ArtifactStore:
+    Type: String
+    Description: Name of S3 bucket
+  S3BuildsPrefix:
+    Type: String
+    Default: builds/lambdas
+    Description: Location of lambda builds in S3 Bucket
+  TemplateFileName:
+    Type: String
+    Default: template_file.yaml
+    Description: Name of the cloudformation template created by codebuild
+  GithubConnectionArn:
+    Type: String
+    Description: This arn is created in codepipeline connections through the console
+  GithubRepositoryName:
+    Type: String
+    Description: Path of the Github repository
+  GithubBranch:
+    Type: String
+    Default: main
+    Description: Name of the branch
 Resources:
   CFNLambda:
     Type: 'AWS::Lambda::Function'
@@ -384,6 +415,187 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: ab1178ed-5711-4ca8-8f55-e1df22af17d0
+  IAMRIJG6:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: Transcribe_role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: '*'
+            Effect: Allow
+            Resource: '*'
+        Principal:
+          Service: cloudformation.amazonaws.com
+        Action:
+          - 'sts:AssumeRole'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d302a9f9-baa9-4361-a041-1c64b8688312
+  IAMR11Z6Z:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: Transcribe_role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: '*'
+            Effect: Allow
+            Resource: '*'
+        Principal:
+          Service: codepipeline.amazonaws.com
+        Action:
+          - 'sts:AssumeRole'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 2eeadd19-79c0-4f8e-9c3e-7cb5485ae618
+  IAMR1AF1C:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: Transcribe_role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action: '*'
+            Effect: Allow
+            Resource: '*'
+        Principal:
+          Service: codebuild.amazonaws.com
+        Action:
+          - 'sts:AssumeRole'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 826b894c-88b5-41e2-adba-a7fe842e8d32
+  CBP3QRF4:
+    Type: 'AWS::CodeBuild::Project'
+    Properties:
+      Name: lambda-code-pipeline
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: 'aws/codebuild/standard:5.0'
+        ImagePullCredentialsType: CODEBUILD
+        Type: LINUX_CONTAINER
+        PrivilegedMode: true
+        EnvironmentVariables:
+          - Name: AWS_DEFAULT_REGION
+            Value: !Ref 'AWS::Region'
+          - Name: AWS_ACCOUNT_ID
+            Value: !Ref 'AWS::AccountId'
+          - Name: S3_BUCKET
+            Value: !Ref S3ArtifactStore
+          - Name: S3_BUILDS_PREFIX
+            Value: !Ref S3BuildsPrefix
+          - Name: TEMPLATE_FILE_NAME
+            Value: !Ref TemplateFileName
+      ServiceRole: !GetAtt 
+        - IAMR1AF1C
+        - Arn
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: configuration/buildspec.yaml
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d6e7c83d-a417-4af9-9278-84a1291d22bf
+  CPP20H1Z:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: lambda-pipeline
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3ArtifactStore
+      RoleArn: !GetAtt 
+        - IAMR11Z6Z
+        - Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: ApplicationSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref GithubConnectionArn
+                FullRepositoryId: 20af02/photo-web-application
+                BranchName: lambda
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+        - Name: Build
+          Actions:
+            - Name: BuildProject
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                ProjectName: !Ref CodeBuild
+              InputArtifacts:
+                - Name: SourceArtifact
+              OutputArtifacts:
+                - Name: BuildArtifact
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 116ab870-c2cc-4109-ae9a-801378dec2c3
+    DependsOn:
+      - S3B1S91K
+  S3B1S91K:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: S3ArtifactStore
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: bcace4e2-e4fa-4265-b798-ee7297ef3d51
+  CPP47P0J:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: frontend-pipeline
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3ArtifactStore
+      RoleArn: !GetAtt 
+        - IAMR11Z6Z
+        - Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: ApplicationSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn: !Ref GithubConnectionArn
+                FullRepositoryId: 20af02/photo-web-application
+                BranchName: lambda
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceArtifact
+        - Name: Deploy
+          Actions:
+            - Name: Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: S3
+                Version: '1'
+              Configuration:
+                BucketName: !Ref S3B1AW9O
+                CannedACL: public-read
+                Extract: true
+              InputArtifacts:
+                - Name: SourceArtifact
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 678ead06-deb1-4eea-8c22-6b6a4883b304
+    DependsOn:
+      - S3B1S91K
+      - S3B1AW9O
 Outputs:
   WebsiteURL:
     Value: !GetAtt 
@@ -530,8 +742,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: -280
-        'y': 200
+        x: -70
+        'y': 210
       z: 1
       embeds: []
     c6746086-6377-424d-bc80-9ef78e9812f1:
@@ -539,8 +751,8 @@ Metadata:
         width: 150
         height: 150
       position:
-        x: -240
-        'y': 660
+        x: 40
+        'y': 430
       z: 1
       embeds: []
       dependson:
@@ -550,8 +762,8 @@ Metadata:
         width: 60
         height: 60
       position:
-        x: -60
-        'y': 630
+        x: 280
+        'y': 470
       z: 1
       embeds: []
     ab1178ed-5711-4ca8-8f55-e1df22af17d0:
@@ -563,3 +775,89 @@ Metadata:
         'y': 420
       z: 0
       embeds: []
+    d302a9f9-baa9-4361-a041-1c64b8688312:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -230
+        'y': -50
+      z: 0
+      embeds: []
+    2eeadd19-79c0-4f8e-9c3e-7cb5485ae618:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -150
+        'y': -50
+      z: 0
+      embeds: []
+    826b894c-88b5-41e2-adba-a7fe842e8d32:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -370
+        'y': -50
+      z: 0
+      embeds: []
+    d6e7c83d-a417-4af9-9278-84a1291d22bf:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -370
+        'y': 40
+      z: 0
+      embeds: []
+    116ab870-c2cc-4109-ae9a-801378dec2c3:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -300
+        'y': 130
+      z: 0
+      embeds: []
+      dependson:
+        - bcace4e2-e4fa-4265-b798-ee7297ef3d51
+    bcace4e2-e4fa-4265-b798-ee7297ef3d51:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -470
+        'y': -50
+      z: 0
+      embeds: []
+    678ead06-deb1-4eea-8c22-6b6a4883b304:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: -240
+        'y': 220
+      z: 0
+      embeds: []
+      dependson:
+        - bcace4e2-e4fa-4265-b798-ee7297ef3d51
+        - 223d0950-9ce0-40c9-aba2-8f31827db03c
+    a05fd3c7-2009-469c-9781-1cd90d86d5ad:
+      source:
+        id: 116ab870-c2cc-4109-ae9a-801378dec2c3
+      target:
+        id: bcace4e2-e4fa-4265-b798-ee7297ef3d51
+      z: 11
+    5dc60e19-03c6-4d86-81ed-bb32ac5b0946:
+      source:
+        id: 678ead06-deb1-4eea-8c22-6b6a4883b304
+      target:
+        id: bcace4e2-e4fa-4265-b798-ee7297ef3d51
+      z: 12
+    083e82f2-7cd3-4526-b2c3-f70db384f225:
+      source:
+        id: 678ead06-deb1-4eea-8c22-6b6a4883b304
+      target:
+        id: 223d0950-9ce0-40c9-aba2-8f31827db03c
+      z: 13
