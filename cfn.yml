@@ -482,7 +482,7 @@ Resources:
         - Arn
       Source:
         Type: CODEPIPELINE
-        BuildSpec: configuration/buildspec.yaml
+        BuildSpec: configuration/buildspec.yml
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d6e7c83d-a417-4af9-9278-84a1291d22bf
