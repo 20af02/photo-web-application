@@ -2,9 +2,14 @@ import json
 import boto3
 import requests
 from datetime import datetime
-from variables import *
 from boto3.dynamodb.conditions import Key
 from requests_aws4auth import AWS4Auth
+
+ES_URL = 'https://search-photos-43fujylnysy6lim7lrzsclhxei.us-east-1.es.amazonaws.com'
+ACCESS_KEY = 'AKIATGGMT67RWZ5AK6UF'
+SECRET_KEY = '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'
+USER = 'master'
+PASS = '?hZV+2.D'
 
 
 def detect_labels(bucket, key, min_conf=95):
