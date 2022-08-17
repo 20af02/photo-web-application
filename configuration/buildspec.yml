@@ -15,10 +15,10 @@ phases:
       - cd ..
       - cd lambda
       - mv LF1.py lambda_function.py
-      - zip -g deployment_package_lf1.zip lambda_function.py
+      - zip -r9 deployment_package_lf1.zip lambda_function.py
       - mv lambda_function.py LF1.py
       - mv LF2.py lambda_function.py
-      - zip -g deployment_package_lf2.zip lambda_function.py
+      - zip -r9 deployment_package_lf2.zip lambda_function.py
       - mv lambda_function.py LF2.py
   post_build:
     commands:
@@ -26,4 +26,3 @@ phases:
       - aws lambda update-function-code --function-name LF1-Final --zip-file fileb://deployment_package_lf1.zip
       - aws lambda update-function-code --function-name picSearchCFN --zip-file fileb://deployment_package_lf2.zip
       - echo "DONE."
-      
